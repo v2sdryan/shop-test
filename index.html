@@ -1111,11 +1111,7 @@ service firebase.storage {
                         </div>
                         <div class="date-badge">🕐 ${dateStr}</div>
                     </div>
-                    ${Object.values(c.photos || {}).find(url => url) ? 
-  `<div style="margin-top: 8px;">
-     <img src="${Object.values(c.photos || {}).find(url => url)}" style="height: 60px; border-radius: 4px; border: 1px solid #ddd;">
-   </div>` : ''
-}
+
                 `;
             }).join('');
         }
