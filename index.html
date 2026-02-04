@@ -1044,7 +1044,7 @@ service firebase.storage {
                 for (const [type, data] of Object.entries(customerData.photos)) {
                     if (data) {
                         try {
-                            const fileName = `photos/${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${type}.jpg`;
+                            const fileName = `photos/${Date.now()}_${Math.random().toString(36).substring(2, 11)}_${type}.jpg`;
                             const ref = storage.ref().child(fileName);
                             console.log('Uploading:', fileName);
                             
@@ -1116,7 +1116,7 @@ service firebase.storage {
                         // Check if it's a new upload (base64) or existing URL
                         if (data.startsWith('data:')) {
                             try {
-                                const fileName = `photos/${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${type}.jpg`;
+                                const fileName = `photos/${Date.now()}_${Math.random().toString(36).substring(2, 11)}_${type}.jpg`;
                                 const ref = storage.ref().child(fileName);
                                 const metadata = { contentType: 'image/jpeg' };
                                 await ref.putString(data, 'data_url', metadata);
@@ -1527,6 +1527,13 @@ service firebase.storage {
         }
 
         // ============ Photo Upload Handling ============
+        /**
+         * Compress an image to 1/4 of its original size
+         * The compression reduces both width and height by half (resulting in 1/4 total area)
+         * @param {File} file - The image file to compress
+         * @param {number} quality - JPEG quality (0-1), default 0.5 for 50% quality
+         * @returns {Promise<string>} - Base64 encoded compressed image data URL
+         */
         async function compressImage(file, quality = 0.5) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
