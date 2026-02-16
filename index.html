@@ -123,6 +123,10 @@
             font-size: 0.75rem;
         }
 
+        body.hide-upload-tab .nav-item-upload {
+            display: none;
+        }
+
         .nav-item.active {
             color: var(--primary);
         }
@@ -1298,7 +1302,7 @@ service firebase.storage {
             <span class="nav-icon">🏠</span>
             首頁
         </button>
-        <button class="nav-item" onclick="newRecord()">
+        <button class="nav-item nav-item-upload" onclick="newRecord()">
             <span class="nav-icon">➕</span>
             上載
         </button>
@@ -1978,6 +1982,9 @@ service firebase.storage {
                 document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
             }
 
+            // Upload page does not need to show the "上載" nav tab again
+            document.body.classList.toggle('hide-upload-tab', pageName === 'upload');
+
             if (pageName === 'home') {
                 // Clear selections when returning to home page
                 selectedCustomers.clear();
@@ -2498,27 +2505,10 @@ service firebase.storage {
                 showToast(isEditing ? '✓ 資料已更新' : '✓ 資料已儲存', 'success');
                 
                 if (isEditing) {
-                    // Stay on the same page, reload updated data
-                    const updatedCustomers = await loadCustomers();
-                    const updatedCustomer = updatedCustomers.find(c => c.id === window.editingCustomerId);
-                    if (updatedCustomer) {
-                        // Re-populate form with fresh data
-                        document.getElementById('customerNumber').value = updatedCustomer.number || '';
-                        document.getElementById('customerOldNumber').value = updatedCustomer.oldNumber || '';
-                        selectedLensTypes = [...(updatedCustomer.lensTypes || [])];
-                        document.querySelectorAll('.lens-type-btn').forEach(btn => {
-                            btn.classList.toggle('selected', selectedLensTypes.includes(btn.dataset.type));
-                        });
-                        setRxData(updatedCustomer.rx);
-                        Object.keys(uploadedPhotos).forEach(key => {
-                            uploadedPhotos[key] = updatedCustomer.photos?.[key] || null;
-                        });
-                        document.querySelectorAll('.photo-upload-item').forEach(item => {
-                            updatePhotoPreview(item, uploadedPhotos[item.dataset.type]);
-                        });
-                    }
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '更新資料';
+                    // Exit edit mode after update
+                    window.editingCustomerId = null;
+                    resetUploadForm();
+                    showPage('home');
                     return;
                 }
                 
